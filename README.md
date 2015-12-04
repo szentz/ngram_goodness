@@ -20,7 +20,9 @@ I am going to start this answer with, "I dont really know".  All I am completely
 I have never worked with anything at this scale yet so I would have a lot of questions.  My process would be something like:
 
 1.) Ask my team if they had ideas, reach out to my network of engineers for some suggestions, research how others have solved this.
+
 2.) Investigate how flexible and easy it would be to introduce new technologies or languages into the current enterprise solution.
+
 3.) Experiment and learn what Apache Spark can do for me.  This seems to be gaining huge ground in large scale data processing and integrates well with Hadoop, HBase, SQl, etc...  Also allows us to write applications in various languages... Java, Python, R, etc...  This seems like a powerful and flexible solution but would require some time to come up to speed.
 
 
