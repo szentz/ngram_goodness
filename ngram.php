@@ -1,7 +1,7 @@
 <?php
 
 # Ingest arguments, (1) filename and (2) max ngram considered. 
-$filename = $argv[1];
+$fileName = $argv[1];
 $maxN = $argv[2];
 
 # TODO -- Add defensive measures like check if file exists and is readable and that max ngram is a valid integer >= to 1 
@@ -14,17 +14,18 @@ $stopWordsHash = array('a' => 1, 'the' => 1);
 
 # Reads in the file, removes non alphanumeric characters and stopwords.  
 function buildTokenArray($fileName) {
-	global $stopWordHash;
+	global $stopWordsHash;
 	global $tokenArr;
 
 	# TODO -- Cant assume we can read in to memory... should read in as buffer and loop
 	# Also... should I keep numbers?  I will for now.
-	$filteredText = preg_replace( "/[^a-z0-9 \n\t]/i", "", file_get_contents($fileName, 'r') or die("error message!"));
+	$inText = file_get_contents($fileName, 'r') or die("error message!");
+	$filteredText = preg_replace("/[^a-z0-9 \n\t]/i", "", $inText);
 
 	# Tokenize on space, new lines, or tabs	
-	$token = strtok("$text", " \n\t");
+	$token = strtok($filteredText, " \n\t");
 	while($token !== false) {
-		if (!exists $stopWordsHash[$token])
+		if (!isset($stopWordsHash[$token]))
 			$tokenArr[] = $token;
 
 		$token = strtok(" \n\t");
@@ -32,19 +33,19 @@ function buildTokenArray($fileName) {
 }
 
 # Loops through token array and builds n-grams, stores count in hash for sorting
-function buildNGramHash($minN, $maxN) {
+function buildNGramHash($maxN) {
 	global $tokenArr, $ngramHash;
 	$numTokens = count($tokenArr); 
 
 	# Koop through each token	
 	for ($i = 0; $i < $numTokens; $i++) {
-		$count = 0;
+		$count = 1;
 		# Look ahead at tokens less then maxN away		
-		while($count < $maxN and $i + $count < $numTokens) {
-			$ngram = implode(" ", $i, $count);
-			
+		while($count <= $maxN and $i + $count <= $numTokens) {
+			$ngram = implode(" ", array_slice($tokenArr, $i, $count));
+
 			#Keep track of results in hash			
-			if (exists $ngramHash[$ngram)
+			if (isset($ngramHash[$ngram]))
 				$ngramHash[$ngram]++;
 			else
 				$ngramHash[$ngram] = 1;
@@ -56,14 +57,15 @@ function buildNGramHash($minN, $maxN) {
 
 # Custom sort algorithm.  Shorter ngrams first, then alphabetical.
 function cmp($a, $b) {
-	$aStrLen = strlen($a);
-	$bStrLen = strlen($b);
+	$aWordCnt = str_word_count($a);
+	$bWordCnt = str_word_count($b);
 		
-	if ($aStrLen < $bStrLen)
+	if ($aWordCnt < $bWordCnt)
 		return -1;
-	else if ($aStrLen > $bStrLen)
+	else if ($aWordCnt > $bWordCnt)
 		return 1;
-	else return strcasecmp($a, $b)
+	else 
+	    return strcasecmp($a, $b);
 }
 
 # Main Code:
@@ -74,10 +76,10 @@ buildTokenArray($fileName);
 
 # Process token array, build hash of ngram counts.
 # Populates $ngramHash
-buildNGramHash($minM, $maxM);
+buildNGramHash($maxN);
 
 # Print results for now
-# TODO -- Odds are Id write this to a file some data repo
+# TODO -- Odds are I'd write this to a file some data repo
 
 uksort($ngramHash, "cmp");
 foreach ($ngramHash as $ngram => $count) {
