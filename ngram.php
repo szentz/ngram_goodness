@@ -37,7 +37,7 @@ function buildNGramHash($maxN) {
 	global $tokenArr, $ngramHash;
 	$numTokens = count($tokenArr); 
 
-	# Koop through each token	
+	# Loop through each token	
 	for ($i = 0; $i < $numTokens; $i++) {
 		$count = 1;
 		# Look ahead at tokens less then maxN away		
